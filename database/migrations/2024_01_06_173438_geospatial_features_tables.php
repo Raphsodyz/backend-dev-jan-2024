@@ -46,10 +46,6 @@ return new class extends Migration
             $table->spatialIndex('geom');
         });
 
-        DB::statement('CREATE INDEX idx_municipios_geometria_geom ON municipios_geometria USING gist(geom)');
-        DB::statement('CREATE INDEX idx_estados_geometria_geom ON estados_geometria USING gist(geom)');
-        DB::statement('CREATE INDEX idx_pontos_usuario_geom ON pontos_usuario USING gist(geom)');
-
         DB::table('estados_geometria')->insert([
             ['id' => uuid_create(UUID_TYPE_RANDOM), 'nome_estado' => 'MG', 'geom' => null],
             ['id' => uuid_create(UUID_TYPE_RANDOM), 'nome_estado' => 'SP', 'geom' => null]
