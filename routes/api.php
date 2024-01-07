@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MunicipioController;
+use App\Http\Controllers\PontosController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,4 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/localizar-municipio', [MunicipioController::class, 'GetByLatLong']);
+Route::get('/localizar-municipio', [MunicipioController::class, 'ShowByLatLong']);
+Route::get('/pontos', [PontosController::class, 'ShowById']);
+Route::delete('/pontos/{id}', [PontosController::class, 'RemoveById']);
+Route::put('/pontos/{id}', [PontosController::class, 'Update']);
