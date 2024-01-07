@@ -25,10 +25,12 @@ class DatabaseSeeder extends Seeder
             $idMG = Estado::select('id')->where('nome_estado', '=', 'MG')->value('id');
             $response_mg = Http::get('https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-31-mun.json');
             self::populateDatabase($response_mg, $idMG);
+            self::generateStateGeometry($idMG);
 
             $idSP = Estado::select('id')->where('nome_estado', '=', 'SP')->value('id');
             $response_sp = Http::get('https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-35-mun.json');
             self::populateDatabase($response_sp, $idSP);
+            self::generateStateGeometry($idSP);
         }
         catch(Exception $ex)
         {
@@ -58,5 +60,18 @@ class DatabaseSeeder extends Seeder
                 $model->save();
             }
         });
+    }
+
+    private static function generateStateGeometry($idState)
+    {
+        $aggregateCities = Municipio::where('id_state', '=', $idState)
+            ->select('id_state', DB::raw('ST_Union(ST_MakeValid(geom::geometry)) as state_geometry'))
+            ->groupBy('id_state')
+            ->first();
+
+        DB::table('estados_geometria')->updateOrInsert(
+            ['id' => $idState],
+            ['geom' => $aggregateCities->state_geometry]
+        );
     }
 }
