@@ -36,7 +36,7 @@ class MunicipioController extends Controller
      *      @OA\Response(response="500", description="Unavailable service.")
      * )
     */
-    public function GetMunicipio(Request $request)
+    public function GetByLatLong(Request $request)
     {
         try
         {
