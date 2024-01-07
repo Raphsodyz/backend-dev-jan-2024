@@ -11,4 +11,6 @@ class Municipio extends Model
     public $incrementing = false;
     protected $primaryKey = 'id';
     protected $connection = 'pgsql';
+    protected $fillable = ['id', 'nome_municipio', 'geom', 'id_estado'];
+    public $timestamps = false;
 }

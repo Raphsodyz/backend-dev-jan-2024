@@ -11,4 +11,5 @@ class Estado extends Model
     public $incrementing = false;
     protected $primaryKey = 'id';
     protected $connection = 'pgsql';
+    public $timestamps = false;
 }
