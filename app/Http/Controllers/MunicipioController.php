@@ -43,8 +43,8 @@ class MunicipioController extends Controller
             $latitude = $request->input('latitude');
             $longitude = $request->input('longitude');
 
-            $point = DB::raw("ST_MakePoint($longitude, $latitude)");
-            $result = Municipio::whereRaw("ST_Contains(geom, $point)")->first();
+            $point = DB::raw("ST_SetSRID(ST_Point($longitude, $latitude), 4326)");
+            $result = Municipio::whereRaw("ST_Contains(CAST(geom AS geometry), $point)")->first();
 
             if(!$result)
                 return response()->json(['Error' => 'Not found municipio with these lat/lon.'], 404);
