@@ -1,0 +1,46 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "TerraQ test endpoints",
+        "description": "API for interation with data.",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/localizar-municipio": {
+            "get": {
+                "tags": [
+                    "Municipios Controller"
+                ],
+                "summary": "Method for find municipio by his lat/lon.",
+                "operationId": "2d3a2066d5792c30b8132934c596f7aa",
+                "parameters": [
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "schema": {
+                            "type": "double"
+                        }
+                    },
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "schema": {
+                            "type": "double"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data found!"
+                    },
+                    "404": {
+                        "description": "Resource not found with the informed lat/lon."
+                    },
+                    "500": {
+                        "description": "Unavailable service."
+                    }
+                }
+            }
+        }
+    }
+}
