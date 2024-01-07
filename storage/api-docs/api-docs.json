@@ -12,7 +12,7 @@
                     "Municipios Controller"
                 ],
                 "summary": "Method for find municipio by his lat/lon.",
-                "operationId": "2d3a2066d5792c30b8132934c596f7aa",
+                "operationId": "5e13988299b7f416803bf58452552438",
                 "parameters": [
                     {
                         "name": "longitude",
@@ -35,6 +35,110 @@
                     },
                     "404": {
                         "description": "Resource not found with the informed lat/lon."
+                    },
+                    "500": {
+                        "description": "Unavailable service."
+                    }
+                }
+            }
+        },
+        "/api/pontos": {
+            "get": {
+                "tags": [
+                    "Pontos Controller"
+                ],
+                "summary": "Method for find ponto by his uuid.",
+                "operationId": "16c737b6cceb0bf70d37666516763ba9",
+                "parameters": [
+                    {
+                        "name": "ID",
+                        "in": "query",
+                        "schema": {
+                            "type": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data found!"
+                    },
+                    "404": {
+                        "description": "Resource not found with the informed ID."
+                    },
+                    "500": {
+                        "description": "Unavailable service."
+                    }
+                }
+            }
+        },
+        "/api/pontos/{id}": {
+            "put": {
+                "tags": [
+                    "Pontos Controller"
+                ],
+                "summary": "Method for update ponto by his uuid.",
+                "operationId": "612161913a78fe3661e3f8f38dae16af",
+                "parameters": [
+                    {
+                        "name": "ID",
+                        "in": "path",
+                        "schema": {
+                            "type": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "double"
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "double"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated!"
+                    },
+                    "404": {
+                        "description": "Resource not found with the informed ID."
+                    },
+                    "500": {
+                        "description": "Unavailable service."
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Pontos Controller"
+                ],
+                "summary": "Method for delete ponto by his uuid.",
+                "operationId": "82e65811600c57bbae9a0591d3069dcf",
+                "parameters": [
+                    {
+                        "name": "ID",
+                        "in": "path",
+                        "schema": {
+                            "type": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Deleted!"
+                    },
+                    "404": {
+                        "description": "Resource not found with the informed ID."
                     },
                     "500": {
                         "description": "Unavailable service."
