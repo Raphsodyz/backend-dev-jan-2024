@@ -5,6 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
+
 return new class extends Migration
 {
     /**
@@ -20,17 +21,17 @@ return new class extends Migration
         {
             $table->uuid('id')->primary();
             $table->string('nome_estado')->notNullable()->unique();
-            $table->geometry('geom', 4326)->nullable();
+            $table->polygon('geom', 4326)->nullable();
             $table->spatialIndex('geom');
         });
 
         Schema::create('municipios_geometria', function (Blueprint $table)
         {
             $table->uuid('id')->primary();
-            $table->string('nome_municipio')->notNullable()->unique();
-            $table->geometry('geom', 4326)->notNullable();
-            $table->uuid('id_estado');
-            $table->foreign('id_estado')->references('id')->on('estados_geometria');
+            $table->string('nome_municipio')->notNullable();
+            $table->polygon('geom', 4326)->notNullable();
+            $table->uuid('id_state');
+            $table->foreign('id_state')->references('id')->on('estados_geometria');
             $table->spatialIndex('geom');
         });
 
@@ -41,7 +42,7 @@ return new class extends Migration
             $table->double('longitude', 15, 8);
             $table->uuid('municipio_id');
             $table->foreign('municipio_id')->references('id')->on('municipios_geometria');
-            $table->geometry('geom', 4326)->notNullable();
+            $table->polygon('geom', 4326)->notNullable();
             $table->spatialIndex('geom');
         });
 
@@ -62,11 +63,11 @@ return new class extends Migration
      */
     public function down()
     {
-        DB::statement('DROP EXTENSION IF EXISTS postgis;');
-        Schema::table('municipios_geometria', function(Blueprint $table){ $table->dropSpatialIndex(['geom']); });
         Schema::table('estados_geometria', function(Blueprint $table){ $table->dropSpatialIndex(['geom']); });
+        Schema::table('municipios_geometria', function(Blueprint $table){ $table->dropSpatialIndex(['geom']); });
+        Schema::dropIfExists('pontos_usuario');
         Schema::dropIfExists('municipios_geometria');
         Schema::dropIfExists('estados_geometria');
-        Schema::dropIfExists('pontos_usuario');
+        DB::statement('DROP EXTENSION IF EXISTS postgis;');
     }
 };
