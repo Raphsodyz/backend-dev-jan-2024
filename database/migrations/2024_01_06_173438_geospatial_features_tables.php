@@ -21,7 +21,7 @@ return new class extends Migration
         {
             $table->uuid('id')->primary();
             $table->string('nome_estado')->notNullable()->unique();
-            $table->polygon('geom', 4326)->nullable();
+            $table->multiPolygon('geom', 4326)->nullable();
             $table->spatialIndex('geom');
         });
 
