@@ -131,8 +131,8 @@ class PontosController extends Controller
                 array_merge(['id' => $id], $request->all()),
                 [
                     'id' => ['required', 'uuid'],
-                    'latitude' => 'required|numeric',
-                    'longitude' => 'required|numeric',
+                    'latitude' => 'required|numeric|between:-90,90',
+                    'longitude' => 'required|numeric|between:-180,180',
                 ]
             );
     
