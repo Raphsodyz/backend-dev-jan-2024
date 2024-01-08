@@ -51,7 +51,7 @@
                 "operationId": "35216589916b5a1be875b0a22af870c5",
                 "parameters": [
                     {
-                        "name": "ID",
+                        "name": "id",
                         "in": "path",
                         "schema": {
                             "type": "uuid"
@@ -81,7 +81,7 @@
                 "operationId": "612161913a78fe3661e3f8f38dae16af",
                 "parameters": [
                     {
-                        "name": "ID",
+                        "name": "id",
                         "in": "path",
                         "schema": {
                             "type": "uuid"
@@ -130,7 +130,7 @@
                 "operationId": "82e65811600c57bbae9a0591d3069dcf",
                 "parameters": [
                     {
-                        "name": "ID",
+                        "name": "id",
                         "in": "path",
                         "schema": {
                             "type": "uuid"
