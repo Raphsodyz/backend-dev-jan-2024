@@ -42,7 +42,7 @@ return new class extends Migration
             $table->double('longitude', 15, 8);
             $table->uuid('municipio_id');
             $table->foreign('municipio_id')->references('id')->on('municipios_geometria');
-            $table->polygon('geom', 4326)->notNullable();
+            $table->point('geom', 4326)->nullable();
             $table->spatialIndex('geom');
         });
 
