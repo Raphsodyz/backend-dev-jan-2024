@@ -12,4 +12,10 @@ class PontoUsuario extends Model
     protected $primaryKey = 'id';
     protected $connection = 'pgsql';
     public $timestamps = false;
+    protected $fillable = ['longitude', 'latitude', 'geom'];
+
+    public function municipio()
+    {
+        return $this->belongsTo(Municipio::class, 'id_municipio');
+    }
 }

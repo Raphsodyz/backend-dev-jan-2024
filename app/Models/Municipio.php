@@ -13,4 +13,9 @@ class Municipio extends Model
     protected $connection = 'pgsql';
     protected $fillable = ['id', 'nome_municipio', 'geom', 'id_estado'];
     public $timestamps = false;
+
+    public function pontos()
+    {
+        return $this->hasMany(PontoUsuario::class, 'id_municipio');
+    }
 }
