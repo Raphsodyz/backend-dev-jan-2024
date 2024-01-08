@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 
 class PontosController extends Controller
 {
@@ -18,7 +17,7 @@ class PontosController extends Controller
      *      tags={"Pontos Controller"},
      *      @OA\Parameter(
      *          in="path",
-     *          name="ID",
+     *          name="id",
      *          @OA\Schema(type="uuid"),
      *      ),
      *      @OA\Response(response="200", description="Data found!"),
@@ -31,21 +30,17 @@ class PontosController extends Controller
     {
         try
         {
-            $validator = validator(['id' => $id], ['id' => ['required', 'uuid', Rule::exists('pontos_usuario', 'id'),],]);
+            $validator = validator(['id' => $id], ['id' => ['required', 'uuid'],]);
             if ($validator->fails()) 
                 return response()->json(['error' => $validator->errors()], 400);
 
-            if ($validator->fails()) {
-                return response()->json(['Error' => $validator->errors()], 400);
-            }
-
-            $ponto = PontoUsuario::findOrFail($id);
+            $ponto = PontoUsuario::with('municipio')->findOrFail($id);
             $result = [
                 'id' => $ponto->id,
                 'latitude' => $ponto->latitude,
                 'longitude' => $ponto->longitude,
                 'municipio_id' => $ponto->municipio_id,
-                'municipio' =>  $ponto->municipio->nome_municipio
+                'municipio' =>  $ponto->municipio ? $ponto->municipio->nome_municipio : null,
             ];
             return response()->json(['data' => $result], 200);
         }
@@ -66,7 +61,7 @@ class PontosController extends Controller
      *      tags={"Pontos Controller"},
      *      @OA\Parameter(
      *          in="path",
-     *          name="ID",
+     *          name="id",
      *          @OA\Schema(type="uuid"),
      *      ),
      *      @OA\Response(response="204", description="Deleted!"),
@@ -79,7 +74,7 @@ class PontosController extends Controller
     {
         try
         {
-            $validator = validator(['id' => $id], ['id' => ['required', 'uuid', Rule::exists('pontos_usuario', 'id'),],]);
+            $validator = validator(['id' => $id], ['id' => ['required', 'uuid'],]);
             if ($validator->fails()) 
                 return response()->json(['error' => $validator->errors()], 400);
             
@@ -105,7 +100,7 @@ class PontosController extends Controller
      *      tags={"Pontos Controller"},
      *      @OA\Parameter(
      *          in="path",
-     *          name="ID",
+     *          name="id",
      *          @OA\Schema(type="uuid"),
      *      ),
      *      @OA\RequestBody(
@@ -135,7 +130,7 @@ class PontosController extends Controller
             $validator = Validator::make(
                 array_merge(['id' => $id], $request->all()),
                 [
-                    'id' => ['required', 'uuid', Rule::exists('pontos_usuario', 'id'),],
+                    'id' => ['required', 'uuid'],
                     'latitude' => 'required|numeric',
                     'longitude' => 'required|numeric',
                 ]
@@ -148,13 +143,7 @@ class PontosController extends Controller
             $ponto = PontoUsuario::findOrFail($id);
             $ponto->update($request->only(['latitude', 'longitude']));
 
-            $newLongitude = $request->input('longitude');
-            $newLatitude = $request->input('latitude');
-
-            $polygonPoint = "POINT(?, ?)";
-            $ponto->update(['geom' => DB::raw("ST_Buffer(ST_GeomFromText('$polygonPoint', 4326), 0.01)")], 
-                [$newLongitude, $newLatitude]);
-            
+            $ponto->update(['geom' => DB::raw("public.ST_SetSRID(public.ST_MakePoint($request->longitude, $request->latitude), 4326)")]);
             $result = [
                 'id' => $ponto->id,
                 'latitude' => $ponto->latitude,
