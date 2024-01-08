@@ -93,11 +93,11 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "latitude": {
+                                    "longitude": {
                                         "type": "number",
                                         "format": "double"
                                     },
-                                    "longitude": {
+                                    "latitude": {
                                         "type": "number",
                                         "format": "double"
                                     }
@@ -165,11 +165,11 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "latitude": {
+                                    "longitude": {
                                         "type": "number",
                                         "format": "double"
                                     },
-                                    "longitude": {
+                                    "latitude": {
                                         "type": "number",
                                         "format": "double"
                                     },
