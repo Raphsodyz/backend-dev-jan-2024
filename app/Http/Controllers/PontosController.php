@@ -135,11 +135,7 @@ class PontosController extends Controller
             $validator = Validator::make(
                 array_merge(['id' => $id], $request->all()),
                 [
-                    'id' => [
-                        'required',
-                        'uuid', // Assuming the id is a UUID; adjust as needed
-                        Rule::exists('ponto_usuarios', 'id'),
-                    ],
+                    'id' => ['required', 'uuid', Rule::exists('pontos_usuario', 'id'),],
                     'latitude' => 'required|numeric',
                     'longitude' => 'required|numeric',
                 ]
@@ -208,7 +204,36 @@ class PontosController extends Controller
     {
         try
         {
-            
+            $validator = Validator::make($request->all(), [
+                'latitude' => ['required', 'numeric', 'between:-90, 90'],
+                'longitude' => ['required', 'numeric', 'between:-180, 180'],
+                'municipio_id' => ['required', 'uuid'],
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 400);
+            }
+
+            $ponto = new PontoUsuario();
+            DB::transaction(function() use ($request, $ponto){
+                $ponto->id = uuid_create(UUID_TYPE_RANDOM);
+                $ponto->longitude = $request->input('longitude');
+                $ponto->latitude = $request->input('latitude');
+                $ponto->municipio_id = $request->input('municipio_id');
+                $ponto->save();
+                
+                $ponto->update(['geom' => DB::raw("public.ST_SetSRID(public.ST_MakePoint($ponto->longitude, $ponto->latitude), 4326)")]);
+            });
+
+            $result = [
+                'id' => $ponto->id,
+                'latitude' => $ponto->latitude,
+                'longitude' => $ponto->longitude,
+                'municipio_id' => $ponto->municipio_id,
+            ];
+
+            $location = route('pontos.show', ['id' => $ponto->id]);
+            return response()->json($result, 201)->header('Location', $location);
         }
         catch(Exception $ex)
         {
