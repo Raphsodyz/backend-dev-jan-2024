@@ -21,7 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/localizar-municipio', [MunicipioController::class, 'ShowByLatLong']);
-Route::get('/pontos/{id}', [PontosController::class, 'ShowById']);
-Route::delete('/pontos/{id}', [PontosController::class, 'RemoveById']);
-Route::put('/pontos/{id}', [PontosController::class, 'Update']);
-Route::post('/pontos', [PontosController::class, 'Create']);
+Route::get('/pontos/{id}', [PontosController::class, 'ShowById'])->name('pontos.show');
+Route::delete('/pontos/{id}', [PontosController::class, 'RemoveById'])->name('pontos.remove');
+Route::put('/pontos/{id}', [PontosController::class, 'Update'])->name('pontos.update');
+Route::post('/pontos', [PontosController::class, 'Create'])->name('pontos.create');
