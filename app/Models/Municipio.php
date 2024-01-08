@@ -3,6 +3,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Municipio extends Model
@@ -18,5 +19,10 @@ class Municipio extends Model
     public function pontos() : HasMany
     {
         return $this->hasMany(PontoUsuario::class);
+    }
+
+    public function estado() : BelongsTo
+    {
+        return $this->belongsTo(Estado::class);
     }
 }
