@@ -41,12 +41,12 @@ class MunicipioController extends Controller
         try
         {
             $validator = $request->validate([
-                'latitude' => ['required', 'numeric', 'between:-90,90'],
                 'longitude' => ['required', 'numeric', 'between:-180,180'],
+                'latitude' => ['required', 'numeric', 'between:-90,90']
             ]);
 
-            $latitude = $request->input('latitude');    
             $longitude = $request->input('longitude');
+            $latitude = $request->input('latitude');    
 
             $result = Municipio::join('estados_geometria', 'municipios_geometria.id_state', '=', 'estados_geometria.id')
                 ->select('municipios_geometria.id', 'municipios_geometria.nome_municipio', 'municipios_geometria.id_state', 'estados_geometria.nome_estado')

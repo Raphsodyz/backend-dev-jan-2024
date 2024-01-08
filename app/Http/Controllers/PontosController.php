@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 use App\Models\PontoUsuario;
+use Dotenv\Exception\ValidationException;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class PontosController extends Controller
 {
@@ -37,8 +39,8 @@ class PontosController extends Controller
             $ponto = PontoUsuario::with('municipio')->findOrFail($id);
             $result = [
                 'id' => $ponto->id,
-                'latitude' => $ponto->latitude,
                 'longitude' => $ponto->longitude,
+                'latitude' => $ponto->latitude,
                 'municipio_id' => $ponto->municipio_id,
                 'municipio' =>  $ponto->municipio ? $ponto->municipio->nome_municipio : null,
             ];
@@ -108,10 +110,10 @@ class PontosController extends Controller
      *              mediaType="application/json",
      *              @OA\Schema(
      *                  @OA\Property(
-     *                      property="latitude",
+     *                      property="longitude",
      *                      type="double"),
      *                  @OA\Property(
-     *                      property="longitude",
+     *                      property="latitude",
      *                      type="double"
      *                  ),
      *              ),
@@ -131,8 +133,8 @@ class PontosController extends Controller
                 array_merge(['id' => $id], $request->all()),
                 [
                     'id' => ['required', 'uuid'],
-                    'latitude' => 'required|numeric|between:-90,90',
                     'longitude' => 'required|numeric|between:-180,180',
+                    'latitude' => 'required|numeric|between:-90,90'
                 ]
             );
     
@@ -141,13 +143,13 @@ class PontosController extends Controller
             }
 
             $ponto = PontoUsuario::findOrFail($id);
-            $ponto->update($request->only(['latitude', 'longitude']));
+            $ponto->update($request->only(['longitude', 'latitude']));
 
             $ponto->update(['geom' => DB::raw("public.ST_SetSRID(public.ST_MakePoint($request->longitude, $request->latitude), 4326)")]);
             $result = [
                 'id' => $ponto->id,
-                'latitude' => $ponto->latitude,
-                'longitude' => $ponto->longitude
+                'longitude' => $ponto->longitude,
+                'latitude' => $ponto->latitude
             ];
 
             response()->json(['data' => $result], 200);
@@ -172,10 +174,10 @@ class PontosController extends Controller
      *              mediaType="application/json",
      *              @OA\Schema(
      *                  @OA\Property(
-     *                      property="latitude",
+     *                      property="longitude",
      *                      type="double"),
      *                  @OA\Property(
-     *                      property="longitude",
+     *                      property="latitude",
      *                      type="double"),
      *                  @OA\Property(
      *                      property="municipio_id",
@@ -194,9 +196,9 @@ class PontosController extends Controller
         try
         {
             $validator = Validator::make($request->all(), [
-                'latitude' => ['required', 'numeric', 'between:-90, 90'],
                 'longitude' => ['required', 'numeric', 'between:-180, 180'],
-                'municipio_id' => ['required', 'uuid'],
+                'latitude' => ['required', 'numeric', 'between:-90, 90'],
+                'municipio_id' => ['required', 'uuid', Rule::exists('municipios_geometria', 'id')],
             ]);
 
             if ($validator->fails()) {
@@ -216,13 +218,17 @@ class PontosController extends Controller
 
             $result = [
                 'id' => $ponto->id,
-                'latitude' => $ponto->latitude,
                 'longitude' => $ponto->longitude,
+                'latitude' => $ponto->latitude,
                 'municipio_id' => $ponto->municipio_id,
             ];
 
             $location = route('pontos.show', ['id' => $ponto->id]);
             return response()->json($result, 201)->header('Location', $location);
+        }
+        catch(ValidationException $ex)
+        {
+            return response()->json(['Error' => $ex->getMessage()], 400);
         }
         catch(Exception $ex)
         {
