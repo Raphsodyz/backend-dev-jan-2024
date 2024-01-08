@@ -8,6 +8,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Http;
 use App\Models\Municipio;
 use App\Models\Estado;
+use App\Models\GeojsonStates;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
@@ -22,15 +23,19 @@ class DatabaseSeeder extends Seeder
     {
         try
         {
-            $idMG = Estado::select('id')->where('nome_estado', '=', 'MG')->value('id');
-            $response_mg = Http::get('https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-31-mun.json');
-            self::populateDatabase($response_mg, $idMG);
-            self::generateStateGeometry($idMG);
+            GeojsonStates::insert([
+                ['id' => uuid_create(UUID_TYPE_RANDOM), 'state_acronym' => 'MG', 'geojson_link' => 'https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-31-mun.json'],
+                ['id' => uuid_create(UUID_TYPE_RANDOM), 'state_acronym' => 'SP', 'geojson_link' => 'https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-35-mun.json']
+            ]);
 
-            $idSP = Estado::select('id')->where('nome_estado', '=', 'SP')->value('id');
-            $response_sp = Http::get('https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-35-mun.json');
-            self::populateDatabase($response_sp, $idSP);
-            self::generateStateGeometry($idSP);
+            $entries = GeojsonStates::all();
+            foreach($entries as $entry)
+            {
+                $estado = Estado::create(['id' => uuid_create(UUID_TYPE_RANDOM), 'nome_estado' => $entry->state_acronym, 'geom' => null ]);
+                $response = Http::get($entry->geojson_link);
+                self::populateDatabase($response, $estado->id);
+                self::generateStateGeometry($estado->id);
+            }
         }
         catch(Exception $ex)
         {

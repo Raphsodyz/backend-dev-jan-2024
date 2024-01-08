@@ -46,10 +46,12 @@ return new class extends Migration
             $table->spatialIndex('geom');
         });
 
-        DB::table('estados_geometria')->insert([
-            ['id' => uuid_create(UUID_TYPE_RANDOM), 'nome_estado' => 'MG', 'geom' => null],
-            ['id' => uuid_create(UUID_TYPE_RANDOM), 'nome_estado' => 'SP', 'geom' => null]
-        ]);
+        Schema::create('geojson_states', function(Blueprint $table)
+        {
+            $table->uuid('id')->primary();
+            $table->string('state_acronym')->notNullable()->unique();
+            $table->string('geojson_link')->notNullable();
+        });
     }
 
     /**
@@ -64,6 +66,7 @@ return new class extends Migration
         Schema::dropIfExists('pontos_usuario');
         Schema::dropIfExists('municipios_geometria');
         Schema::dropIfExists('estados_geometria');
+        Schema::dropIfExists('geojson_states');
         DB::statement('DROP EXTENSION IF EXISTS postgis;');
     }
 };
