@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Municipio;
 use Exception;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 /**
  * @OA\Info(
@@ -40,16 +40,27 @@ class MunicipioController extends Controller
     {
         try
         {
-            $latitude = $request->input('latitude');
+            $validator = $request->validate([
+                'latitude' => ['required', 'numeric', 'between:-90,90'],
+                'longitude' => ['required', 'numeric', 'between:-180,180'],
+            ]);
+
+            $latitude = $request->input('latitude');    
             $longitude = $request->input('longitude');
 
-            $point = DB::raw("ST_SetSRID(ST_Point($longitude, $latitude), 4326)");
-            $result = Municipio::whereRaw("ST_Contains(CAST(geom AS geometry), $point)")->first();
+            $result = Municipio::join('estados_geometria', 'municipios_geometria.id_state', '=', 'estados_geometria.id')
+                ->select('municipios_geometria.id', 'municipios_geometria.nome_municipio', 'municipios_geometria.id_state', 'estados_geometria.nome_estado')
+                ->whereRaw("public.ST_Intersects(municipios_geometria.geom::geometry, public.ST_SetSRID(public.ST_MakePoint($longitude, $latitude), 4326))")
+                ->get();
 
-            if(!$result)
+            if($result->count() === 0)
                 return response()->json(['Error' => 'Not found municipio with these lat/lon.'], 404);
                 
-            return response()->json([$result], 200);
+            return response()->json(["data" => $result], 200);
+        }
+        catch(ValidationException $ex)
+        {
+            return response()->json(['Error' => $ex->getMessage()], 400);
         }
         catch(Exception $ex)
         {
