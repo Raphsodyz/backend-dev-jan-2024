@@ -3,6 +3,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PontoUsuario extends Model
 {
@@ -14,8 +15,8 @@ class PontoUsuario extends Model
     public $timestamps = false;
     protected $fillable = ['longitude', 'latitude', 'geom'];
 
-    public function municipio()
+    public function municipio() : BelongsTo
     {
-        return $this->belongsTo(Municipio::class, 'id_municipio');
+        return $this->belongsTo(Municipio::class);
     }
 }
