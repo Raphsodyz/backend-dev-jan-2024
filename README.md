@@ -17,6 +17,9 @@ npm install
 ``` shell
 cp .env.example .env
 ```
+``` shell
+php artisan key:generate
+```
 Dentro do projeto, acesse o arquivo database.php com seu editor de código em config/database.php. Na opção default do arquivo, altere para usar o conector de dados do postgres ```pgsql``` ficando como: ```'default' => env('DB_CONNECTION', 'pgsql'),```. Desça para ```connections``` e na opção ```pgsql``` altere as configurações para as do seu postgres local. Com o banco de dados configurado execute:
 
 ``` shell
