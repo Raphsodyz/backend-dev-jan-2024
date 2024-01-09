@@ -3,7 +3,7 @@
 Requisitos:
 - Php 8.3.1
 - Postgres (utilizada versão psql 16.1)
-- PostGIS instalado junto ao postrgres (utilizado versão 3.4.1-2 archlinux)
+- PostGIS instalado junto ao postrgres (utilizado versão 3.4.1-2 no archlinux)
 
 Faça o download do código acima.
 
