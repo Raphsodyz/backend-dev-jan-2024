@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Interface\IMunicipioRepository;
 use Illuminate\Http\Request;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -55,6 +56,10 @@ class MunicipioController extends Controller
             $result = $this->_municipioRepository->GetByLongLat($join, ['municipios_geometria.id', 'municipios_geometria.nome_municipio', 'municipios_geometria.id_state', 'estados_geometria.nome_estado'], $request->input('longitude'), $request->input('latitude'));
             
             return response()->json(["data" => $result], 200);
+        }
+        catch(ModelNotFoundException $ex)
+        {
+            return response()->json(['Error' => $ex->getMessage()], 404);
         }
         catch(ValidationException $ex)
         {
