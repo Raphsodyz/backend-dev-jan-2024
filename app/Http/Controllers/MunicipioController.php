@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Interface\IMunicipioRepository;
 use Illuminate\Http\Request;
-use App\Models\Municipio;
 use Exception;
 use Illuminate\Validation\ValidationException;
 
@@ -16,6 +16,12 @@ use Illuminate\Validation\ValidationException;
  */
 class MunicipioController extends Controller
 {
+    private IMunicipioRepository $_municipioRepository;
+    public function __construct(IMunicipioRepository $_municipioRepository)
+    {
+        $this->_municipioRepository = $_municipioRepository;
+    }
+
     /** 
      * @OA\Get(
      *      path="/api/localizar-municipio",
@@ -45,17 +51,9 @@ class MunicipioController extends Controller
                 'latitude' => ['required', 'numeric', 'between:-90,90']
             ]);
 
-            $longitude = $request->input('longitude');
-            $latitude = $request->input('latitude');    
-
-            $result = Municipio::join('estados_geometria', 'municipios_geometria.id_state', '=', 'estados_geometria.id')
-                ->select('municipios_geometria.id', 'municipios_geometria.nome_municipio', 'municipios_geometria.id_state', 'estados_geometria.nome_estado')
-                ->whereRaw("public.ST_Intersects(municipios_geometria.geom::geometry, public.ST_SetSRID(public.ST_MakePoint($longitude, $latitude), 4326))")
-                ->get();
-
-            if($result->count() === 0)
-                return response()->json(['Error' => 'Not found municipio with these lat/lon.'], 404);
-                
+            $join = [['table' => 'estados_geometria', 'condition' => 'municipios_geometria.id_state', 'on' => 'estados_geometria.id']];
+            $result = $this->_municipioRepository->GetByLongLat($join, ['municipios_geometria.id', 'municipios_geometria.nome_municipio', 'municipios_geometria.id_state', 'estados_geometria.nome_estado'], $request->input('longitude'), $request->input('latitude'));
+            
             return response()->json(["data" => $result], 200);
         }
         catch(ValidationException $ex)
